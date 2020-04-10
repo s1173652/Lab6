@@ -1,0 +1,51 @@
+---
+title: "Lab 6: Nothing is Normal About This!"
+author: Samantha Cavalli and Bri Cirillo
+date: "9 April 2020"
+output: html_notebook
+---
+
+# Part I: The Rightful pgauss()
+
+## Problem 1
+
+```{r}
+#' Compute F(x) for a Gaussian random variable 
+#' @param x a vector of values to be evaluated at
+#' @param mean the mean of the random variable
+#' @param var the variance of the random variable 
+#'
+#' @return the cumulative distribution function evaluated at all the values of x
+
+x<- c(1,2,3)
+
+pgauss <- function(x,mean=0, var=1){
+  
+  cum.vector <- vector(length = length(x))
+  
+  for (i in 1:length(x)) {
+    
+  cum.vector[i] <- integrate(f=function(x) dnorm(x,0,1), lower= -Inf, upper= x[i])[[1]]
+    
+  
+  }
+  
+  return(cum.vector)
+}
+
+pgauss(x,mean=0,var=1)
+```
+
+## Problem 2
+
+```{r}
+pgauss(3, mean=1, var=2)
+```
+
+The probability that a Gaussian random variable with mean = 1 and variance = 2 exceeds the value of 3 is 1 - 0.999, which is 0.001.
+
+```{r}
+pnorm(q=3,mean=0,sd=1)
+```
+
+We can verify our result using pnorm and get the same answer. 
