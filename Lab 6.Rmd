@@ -5,6 +5,12 @@ date: "9 April 2020"
 output: html_notebook
 ---
 
+```{r}
+#install.packages("Deriv")
+library(Deriv)
+```
+
+
 # Part I: The Rightful pgauss()
 
 ## Problem 1
@@ -49,3 +55,42 @@ pnorm(q=3,mean=0,sd=1)
 ```
 
 We can verify our result using pnorm and get the same answer. 
+
+# Part II: What's a Normal Score?
+
+## Problem 3
+
+```{r}
+curve(pnorm(x,5,10), from = -15, to= 25)
+```
+
+It looks like the 0.25 quantile of this distribution is at is about -2. 
+
+## Problem 4
+
+```{r}
+
+qgauss <- function(q, mean=0, var=1){
+  
+  quant.vector <- vector(length = length(q))
+  
+  for (i in 1: length(q)){
+    f <- function(x) pgauss(x, mean,var) - q[i]
+     quant.vector[i] <- uniroot(f, c(-5,5))[[1]]
+    
+  }
+    
+ return(quant.vector) 
+}
+```
+
+## Problem 5
+
+```{r}
+qgauss(0.25,5,100)
+qnorm(0.25,mean=5,sd=10)
+```
+
+
+
+
