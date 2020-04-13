@@ -10,6 +10,7 @@ output: html_notebook
 library(Deriv)
 ```
 
+https://github.com/s1173652/Lab6
 
 # Part I: The Rightful pgauss()
 
@@ -39,19 +40,25 @@ pgauss <- function(x,mean=0, var=1){
   return(cum.vector)
 }
 
-pgauss(x,mean=0,var=1)
+pgauss(x,mean=0,var=1) 
+
+#testing the function to understand how it works
 ```
 
 ## Problem 2
 
 ```{r}
 pgauss(3, mean=1, var=2)
+
+#finding the probability that a Gaussian RV with mean µ = 1 and variance = 2 exceeds 3
 ```
 
 The probability that a Gaussian random variable with mean = 1 and variance = 2 exceeds the value of 3 is 1 - 0.999, which is 0.001.
 
 ```{r}
 pnorm(q=3,mean=0,sd=1)
+
+# using pnorm to check our prior result using pgauss
 ```
 
 We can verify our result using pnorm and get the same answer. 
@@ -62,6 +69,8 @@ We can verify our result using pnorm and get the same answer.
 
 ```{r}
 curve(pnorm(x,5,10), from = -15, to= 25)
+
+# plotting a cdf curve for a Gaussian RV with mean=5 and var=100
 ```
 
 It looks like the 0.25 quantile of this distribution is at is about -2. 
@@ -69,6 +78,12 @@ It looks like the 0.25 quantile of this distribution is at is about -2.
 ## Problem 4
 
 ```{r}
+#' Compute the quantile function for a Gaussian random variable 
+#' @param q a vector of values to be evaluated at
+#' @param mean the mean of the random variable
+#' @param var the variance of the random variable 
+#'
+#' @return the cumulative distribution function evaluated at all the values of x
 
 qgauss <- function(q, mean=0, var=1){
   
@@ -76,19 +91,107 @@ qgauss <- function(q, mean=0, var=1){
   
   for (i in 1: length(q)){
     f <- function(x) pgauss(x, mean,var) - q[i]
-     quant.vector[i] <- uniroot(f, c(-5,5))[[1]]
+     quant.vector[i] <- uniroot(f, c(mean-3*sqrt(var), mean+3*sqrt(var)))[[1]]
     
   }
     
  return(quant.vector) 
 }
+
+qgauss(.25,mean=0,var=1)
+
+#testing qguass to better understand the function
 ```
 
 ## Problem 5
 
 ```{r}
-qgauss(0.25,5,100)
-qnorm(0.25, mean= 5, sd= 10)
+qgauss(0.25, mean = 5, var = 100)
+
+# finding the 0.25 quantile of a GRV with mean=5 and var=100
+
+qnorm(0.25,mean=5,sd=10)
+
+# checking the previous answer with qnorm
 ```
+
+The 0.25 quantile is -1.745. This answer matches the graphical solution found in Problem 3. 
+
+# Part III: What's the Most Likely Mean?
+
+## Problem 6
+
+```{r}
+#' Compute the log-likelihood function for a Gaussian random variable 
+#' @param mean the mean of the random variable
+#' @param var the variance of the random variable
+#' @param data a vector of values to be evaluated at
+#'
+#' @return the cumulative distribution function evaluated at all the values of x
+
+data <- c(1,2,3)
+
+gaussian.ll <- function(mean,var,data){
+  
+     n <- length(data)
+    
+    sum.data <- sum((data-mean)^2)
+    
+    ll <- -(n/2)*log(2*pi*var)-(1/(2*var))*(sum.data)
+    
+  return(ll)
+}
+
+gaussian.ll(data=c(1,2,3), mean=0, var=1)
+
+#testing guassian.11 to better understand the function
+```
+
+## Problem 7
+
+```{r}
+gaussian.ll.v <- Vectorize(gaussian.ll, vectorize.args = 'mean')
+
+# vectorizing the mean argument
+```
+
+The mean argument is vectorized.
+
+## Problem 8
+
+```{r}
+set.seed(1)
+
+x <- rnorm(100, mean = 0, sd = 1)
+
+# creating a random sample of 100 from a Gaussian distribution
+
+curve(gaussian.ll.v(mean,1,x), from = -5, to = 5, xname= 'mean')
+abline(v=0.1088874, lty =3)
+
+# plot of the log-likelihood function
+```
+
+The value of the mean that maximizes the log-likelihood is around 0. This makes sense given that we generated the sample with a normal distribution, where the standard mean is 0 and the MLE of a normal random variable is the sample mean.
+
+## Problem 9
+
+```{r}
+optimize(gaussian.ll.v,var=1, data= x, interval=c(-5,5),maximum = TRUE)
+
+# finding the value of the mean that maximizes the log-liklihood function
+```
+
+The maximum likelihood estimator for the function is 0.1089. 
+
+## Problem 10
+
+```{r}
+mean(x)
+
+# computing the mean of x
+```
+
+The mean of x is equal to 0.1089, which is the same maximizer found in problem 9. This result is what we would expect since the MLE of a normal random sample is the sample mean. 
 
 
